@@ -124,6 +124,12 @@
                         const ipData = await response.json();
                         if (ipData.error) throw new Error(ipData.reason);
                         cityData = { name: ipData.city, lat: ipData.latitude, lon: ipData.longitude };
+                        
+                        // Update "Local" in the dropdown to the detected city name
+                        const localOption = Array.from(citySelector.options).find(option => option.value === 'Local');
+                        if (localOption) {
+                            localOption.text = cityData.name;
+                        }
                     } else {
                         cityData = cities.find(c => c.name === cityName);
                     }
@@ -141,8 +147,15 @@
                     renderChart(data.daily, textColor);
                 } catch (error) {
                     console.error(error);
-                    const errorCityName = cityName === "Local" ? "votre position" : cityName;
-                    weatherPanel.innerHTML = createErrorContent(errorCityName);
+                    if (cityName === "Local") {
+                        // Geolocation failed, default to Paris
+                        console.warn("Localisation failed, defaulting to Paris.");
+                        citySelector.value = "Paris";
+                        displayWeatherForCity("Paris"); // Recall the function for Paris
+                        return; // Stop execution of this failed instance
+                    }
+                    // For other cities, show the error
+                    weatherPanel.innerHTML = createErrorContent(cityName);
                 } finally {
                     showLoadingState(false);
                     updateTimeElem.textContent = `Données mises à jour à ${new Date().toLocaleTimeString('fr-FR')}`;
