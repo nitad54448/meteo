@@ -87,11 +87,10 @@
                             localOption.text = cityData.name; // Update 'Local' to actual city name
                         }
                     } catch (geoError) {
-                        // THIS IS THE FIX: If geolocation fails, show a warning and fall back to Paris.
                         console.warn("Geolocation failed, falling back to Paris.", geoError);
                         errorMessageContainer.innerHTML = 'Géolocalisation impossible. Affichage pour Paris.';
                         citySelector.value = "Paris";
-                        cityData = cities.find(c => c.name === "Paris"); // Set Paris data and continue
+                        cityData = cities.find(c => c.name === "Paris");
                     }
                 } else {
                     cityData = cities.find(c => c.name === cityName);
@@ -115,14 +114,11 @@
                     renderChart(data.daily, textColor);
 
                 } catch (weatherError) {
-                    // This block catches errors from the weather API itself.
                     console.error(`Failed to display weather for ${cityData?.name || cityName}`, weatherError);
                     weatherPanel.innerHTML = createErrorContent(cityData?.name || cityName);
-                    // Set a neutral, dark background on error.
                     document.body.style.background = `linear-gradient(to right, #6c757d, #495057)`;
                     document.body.style.color = 'white';
                 } finally {
-                    // This always runs, ensuring the loading state is removed.
                     showLoadingState(false);
                     updateTimeElem.textContent = `Données mises à jour à ${new Date().toLocaleTimeString('fr-FR')}`;
                 }
@@ -296,9 +292,21 @@
             // --- HELPER FUNCTIONS ---
 
             const getWeatherInfo = (code) => WMO_CODES[code] || { description: "Inconnu", emoji: "🌍" };
+            
+            /**
+             * THIS FUNCTION IS FIXED
+             * Manages the loading state UI.
+             * @param {boolean} isLoading - Whether the app is currently loading.
+             */
             const showLoadingState = (isLoading) => { 
-                weatherPanel.innerHTML = isLoading ? `<div class="text-center p-8">Chargement...</div>` : weatherPanel.innerHTML;
-                weatherPanel.style.opacity = isLoading ? '0.5' : '1'; 
+                if (isLoading) {
+                    weatherPanel.innerHTML = `<div class="text-center p-8">Chargement...</div>`;
+                    weatherPanel.style.opacity = '0.5';
+                } else {
+                    // Only restore opacity. Do not touch innerHTML, as it would
+                    // clear the newly rendered chart.
+                    weatherPanel.style.opacity = '1'; 
+                }
             };
             const createErrorContent = (city) => `<div class="text-center font-semibold p-8">Impossible de charger les données pour ${city}.<br>Veuillez réessayer plus tard.</div>`;
 
