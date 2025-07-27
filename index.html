@@ -42,6 +42,7 @@
                 <div id="selector-arrow-container" class="ml-2 pointer-events-none"></div>
             </div>
             <p id="update-time" class="text-sm opacity-70">--</p>
+            <div id="error-message-container" class="text-red-500 font-semibold text-sm mt-1"></div>
         </header>
         <main id="weather-panel" class="glass-panel rounded-2xl p-6 min-h-[550px] flex items-center justify-center transition-opacity duration-500">
         </main>
@@ -114,6 +115,9 @@
             };
 
             const displayWeatherForCity = async (cityName) => {
+                // Clear any previous error messages at the start of a new request
+                document.getElementById('error-message-container').innerHTML = '';
+
                 showLoadingState(true);
                 let cityData;
 
@@ -156,9 +160,20 @@
                     renderChart(data.daily, textColor);
 
                 } catch (weatherError) {
+                    // --- THIS IS THE MODIFIED ERROR HANDLING LOGIC ---
                     console.error(`Failed to display weather for ${cityData ? cityData.name : cityName}`, weatherError);
                     const errorCityName = cityData ? cityData.name : cityName;
-                    weatherPanel.innerHTML = createErrorContent(errorCityName);
+
+                    // 1. Display the warning message below the city selector
+                    document.getElementById('error-message-container').innerHTML = `Erreur pour ${errorCityName}. Affichage de Paris.`;
+
+                    // 2. Set the dropdown to "Paris"
+                    citySelector.value = "Paris";
+
+                    // 3. Rerun the entire function for Paris and exit the current one
+                    displayWeatherForCity("Paris");
+                    return;
+
                 } finally {
                     showLoadingState(false);
                     updateTimeElem.textContent = `Données mises à jour à ${new Date().toLocaleTimeString('fr-FR')}`;
