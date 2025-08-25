@@ -1,0 +1,23 @@
+{
+  "name": "meteo",
+  "version": "1.0.0",
+  "description": "local meteo prediction",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nitad54448/meteo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nitad54448/meteo/issues"
+  },
+  "homepage": "https://github.com/nitad54448/meteo#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
